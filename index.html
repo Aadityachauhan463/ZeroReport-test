@@ -1,64 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ZeroReport MVP</title>
+  <title>ZeroReport Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    li { margin: 10px 0; }
+  </style>
 </head>
 <body>
-  <h2>Welcome to ZeroReport 🚀</h2>
-  <p id="firebaseStatus">Not logged in yet</p>
-
+  <h1>ZeroReport Dashboard 🚀</h1>
   <h3>Client Reports:</h3>
-  <div id="reports">
-    Loading reports...
-  </div>
+  <ul id="reportList">
+    Loading client reports...
+  </ul>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  <script>
+    async function loadReports() {
+      const res = await fetch('/client_reports.json');
+      const reports = await res.json();
 
-    // Paste your Firebase config here
-    const firebaseConfig = {
-      apiKey: "AIzaSyCkeWoTK3220IGoCKO5gmcZC1hh13osGJ0",
-      authDomain: "zero-report-test-no-shit.firebaseapp.com",
-      projectId: "zero-report-test-no-shit",
-      storageBucket: "zero-report-test-no-shit.firebasestorage.app",
-      messagingSenderId: "886560196283",
-      appId: "1:886560196283:web:145acafe8f5ddd52150b9e"
-    };
+      const ul = document.getElementById('reportList');
+      ul.innerHTML = '';
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const statusEl = document.getElementById("firebaseStatus");
-    const reportsEl = document.getElementById("reports");
-
-    // Anonymous login
-    signInAnonymously(auth)
-      .then(async () => {
-        statusEl.innerText = "✅ Signed in anonymously with Firebase";
-
-        // Fetch client reports
-        const querySnapshot = await getDocs(collection(db, "clientReports"));
-        if(querySnapshot.empty){
-          reportsEl.innerText = "No reports found 😢";
-        } else {
-          reportsEl.innerHTML = ""; // clear loading text
-          querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const div = document.createElement("div");
-            div.style.border = "1px solid #ccc";
-            div.style.padding = "10px";
-            div.style.margin = "5px 0";
-            div.innerHTML = `<b>${data.clientName}</b> (${data.date})<br>${data.report}`;
-            reportsEl.appendChild(div);
-          });
-        }
-      })
-      .catch(err => {
-        statusEl.innerText = "❌ Firebase error: " + err.message;
+      reports.forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${r.path}" target="_blank">${r.name}</a>`;
+        ul.appendChild(li);
       });
+    }
+
+    loadReports();
   </script>
 </body>
 </html>
