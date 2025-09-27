@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ZeroReport Test</title>
+</head>
+<body>
+  <h2>Welcome to ZeroReport 🚀</h2>
+  <p>This is deployed on <b>Vercel via GitHub</b>!</p>
+
+  <button onclick="callApi()">Ping API</button>
+  <p id="result"></p>
+
+  <script>
+    async function callApi() {
+      const res = await fetch('/api/hello');
+      const data = await res.json();
+      document.getElementById("result").innerText = data.message;
+    }
+  </script>
+</body>
+</html>
