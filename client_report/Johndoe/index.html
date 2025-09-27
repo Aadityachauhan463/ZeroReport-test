@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinnacle Fitness Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF3366;
+            --primary-dark: #E91E63;
+            --dark: #0F0F1E;
+            --light: #FFFFFF;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-dark: linear-gradient(135deg, #0F0F1E 0%, #1a1a2e 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Background Effects */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--gradient-dark);
+        }
+
+        .bg-blur {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+        }
+
+        .bg-blur:nth-child(1) {
+            background: var(--gradient-1);
+            top: -200px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-blur:nth-child(2) {
+            background: var(--gradient-2);
+            bottom: -200px;
+            left: -200px;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        .bg-blur:nth-child(3) {
+            background: var(--gradient-3);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 30s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 60px;
+            padding: 12px 24px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin-bottom: 80px;
+        }
+
+        .hero-title h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .hero-title .accent {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Metrics Section */
+        .metrics-section {
+            margin-bottom: 80px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .metric-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .metric-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .metric-badge {
+            background: var(--gradient-2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .metric-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding-top: 24px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .detail-item {
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+
+        /* Visual Section */
+        .visual-section {
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 48px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .visual-card {
+            aspect-ratio: 16/9;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-3);
+            opacity: 0.1;
+        }
+
+        .visual-icon {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 60px 40px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 48px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .summary-item {
+            text-align: left;
+        }
+
+        .summary-item h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .summary-item p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 40px 10px;
+            }
+
+            .hero-title h1 {
+                font-size: clamp(2.5rem, 8vw, 4rem);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .metric-card {
+                padding: 24px;
+            }
+
+            .visual-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-section {
+                padding: 40px 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .bg-wrapper {
+                display: none;
+            }
+
+            .stat-card,
+            .metric-card,
+            .visual-card,
+            .summary-section {
+                background: #f8f8f8 !important;
+                border: 1px solid #ddd !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-inside: avoid;
+            }
+
+            .hero-title h1,
+            .section-title {
+                color: black !important;
+                -webkit-text-fill-color: black !important;
+            }
+
+            .hero-title .accent,
+            .metric-value {
+                color: var(--primary) !important;
+                -webkit-text-fill-color: var(--primary) !important;
+            }
+
+            .text-secondary {
+                color: #666 !important;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-wrapper">
+        <div class="bg-blur"></div>
+        <div class="bg-blur"></div>
+        <div class="bg-blur"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">P</div>
+                <span class="logo-text">Pinnacle Fitness</span>
+            </div>
+            
+            <div class="hero-title">
+                <h1>
+                    <span class="accent">SUCCESS</span><br>
+                    SUMMARY
+                </h1>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">Total New Customers</div>
+                <div class="stat-value">{total_conversions}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Revenue Per Dollar</div>
+                <div class="stat-value">{peak_roas}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💪</div>
+                <div class="stat-label">Engaged Visitor Increase</div>
+                <div class="stat-value">{ctr_growth}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💵</div>
+                <div class="stat-label">New Leads Week 12</div>
+                <div class="stat-value">{week12_conversions}</div>
+            </div>
+        </section>
+
+        <!-- Metrics Section -->
+        <section class="metrics-section">
+    <div class="metrics-grid">
+
+        <!-- Brand Awareness -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h2 class="metric-title">Brand Awareness</h2>
+            </div>
+            <div class="metric-value">{brand_awareness_conversions} Conversions</div>
+            <div class="metric-subtitle">CTR: {brand_awareness_ctr}% | ROAS: {brand_awareness_roas}</div>
+            <div class="metric-details">
+                <div class="detail-item">
+                    <div class="detail-label">Spend</div>
+                    <div class="detail-value">${brand_awareness_spend}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lead Generation -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h2 class="metric-title">Lead Generation</h2>
+            </div>
+            <div class="metric-value">{lead_gen_conversions} Conversions</div>
+            <div class="metric-subtitle">CTR: {lead_gen_ctr}% | ROAS: {lead_gen_roas}</div>
+            <div class="metric-details">
+                <div class="detail-item">
+                    <div class="detail-label">Spend</div>
+                    <div class="detail-value">${lead_gen_spend}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remarketing -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h2 class="metric-title">Remarketing</h2>
+            </div>
+            <div class="metric-value">{remarketing_conversions} Conversions</div>
+            <div class="metric-subtitle">CTR: {remarketing_ctr}% | ROAS: {remarketing_roas}</div>
+            <div class="metric-details">
+                <div class="detail-item">
+                    <div class="detail-label">Spend</div>
+                    <div class="detail-value">${remarketing_spend}</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+        <!-- Visual Section -->
+        <section class="visual-section">
+            <h2 class="section-title">Summary</h2>
+            <p class="section-subtitle">{supporting_summary}</p>
+            
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-icon">📈</div>
+                </div>
+                <div class="visual-card">
+                    <div class="visual-icon">🏋️</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary / Footer Section -->
+<section class="summary-section">
+    <h2 class="summary-title">Summary & Notes</h2>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <p>
+                Designed by <strong>ZeroReport</strong> for <strong>{client_name}</strong>.<br>
+                All metrics are based on campaign data provided and are intended to highlight key performance insights.<br>
+                Please keep scrolling for more <strong>insights</strong>.
+            </p>
+        </div>
+    </div>
+</section>
+    </div>
+</body>
+  </html>
