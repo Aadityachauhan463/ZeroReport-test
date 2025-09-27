@@ -8,34 +8,45 @@
   <p>This is deployed on <b>Vercel via GitHub</b>!</p>
 
   <button onclick="callApi()">Ping API</button>
-  <p id="result"></p>
+  <p id="apiResult"></p>
+
+  <h3>Firebase Status:</h3>
+  <p id="firebaseStatus">Not logged in yet</p>
 
   <script>
     async function callApi() {
       const res = await fetch('/api/hello');
       const data = await res.json();
-      document.getElementById("result").innerText = data.message;
+      document.getElementById("apiResult").innerText = data.message;
     }
   </script>
 
   <script type="module">
-      // Import Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-          import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-            // Your web app's Firebase config
-              const firebaseConfig = {
-                  apiKey: "AIza...your-key...",
-                      authDomain: "zeroreport-test.firebaseapp.com",
-                          projectId: "zeroreport-test",
-                              storageBucket: "zeroreport-test.appspot.com",
-                                  messagingSenderId: "1234567890",
-                                      appId: "1:1234567890:web:abcdef123456"
-                                        };
+    const firebaseConfig = {
+      apiKey: "AIza...your-key...",
+      authDomain: "zeroreport-test.firebaseapp.com",
+      projectId: "zeroreport-test",
+      storageBucket: "zeroreport-test.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
 
-                                          // Initialize Firebase
-                                            const app = initializeApp(firebaseConfig);
-                                              const auth = getAuth(app);
-                                              </script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Show login status on the page
+    const statusEl = document.getElementById("firebaseStatus");
+
+    signInAnonymously(auth)
+      .then(() => {
+        statusEl.innerText = "✅ Signed in anonymously with Firebase";
+      })
+      .catch(err => {
+        statusEl.innerText = "❌ Firebase error: " + err.message;
+      });
+  </script>
 </body>
 </html>
