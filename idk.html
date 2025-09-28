@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroReport</title>
+    <style>
+        /* ===== Basic Reset ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f9f9f9; color: #333; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ===== Container ===== */
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+
+        /* ===== Header / Logo ===== */
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header p { font-size: 1.2rem; color: #555; }
+
+        /* ===== Buttons ===== */
+        button { padding: 10px 20px; border: none; border-radius: 5px; background: #0070f3; color: #fff; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #005bd1; }
+
+        /* ===== Sections ===== */
+        section { margin-bottom: 40px; }
+        h2 { margin-bottom: 15px; }
+
+        /* ===== Form ===== */
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; }
+        textarea { resize: vertical; min-height: 80px; }
+
+        /* ===== Hidden Sections ===== */
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== Home Page ===== -->
+        <section id="home">
+            <header>
+                <h1>ZeroReport</h1>
+                <p>Your client reporting dashboard, simplified.</p>
+            </header>
+            <button onclick="showSection('login')">Login</button>
+            <button onclick="showSection('contact')">Contact Us</button>
+        </section>
+
+        <!-- ===== Login Page ===== -->
+        <section id="login" class="hidden">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Enter your email" required>
+                <button type="submit">Login</button>
+            </form>
+            <p><a href="#" onclick="showSection('home')">Back to Home</a></p>
+        </section>
+
+        <!-- ===== Contact Page ===== -->
+        <section id="contact" class="hidden">
+            <h2>Contact Us</h2>
+            <form id="contactForm">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <textarea placeholder="Your Message" required></textarea>
+                <button type="submit">Send</button>
+            </form>
+            <p><a href="#" onclick="showSection('home')">Back to Home</a></p>
+        </section>
+
+    </div>
+
+    <script>
+        // ===== Section Switching =====
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        // ===== Client Email Redirect Logic =====
+        const clientEmails = {
+            "johndoe@example.com": "client_reports/johndoe/index.html",
+            "janedoe@example.com": "client_reports/JaneDoe/index.html"
+            // Add more emails here as needed
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            if(clientEmails[email]) {
+                window.location.href = clientEmails[email];
+            } else {
+                alert("Email not recognized. Please contact support.");
+            }
+        });
+
+        // ===== Contact Form Placeholder =====
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert("Thank you! Your message has been sent (placeholder).");
+            showSection('home');
+        });
+    </script>
+
+</body>
+</html>
