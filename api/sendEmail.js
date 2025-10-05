@@ -1,41 +1,41 @@
-import nodemailer from "nodemailer";
+// api/sendEmail.js
+const nodemailer = require('nodemailer');
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+export default async function (req, res) {
+  if (req.method === 'POST') {
+    const { to, subject, body } = req.body;
 
-  const { to, subject, body } = req.body;
-
-  if (!to || !subject || !body) {
-    return res.status(400).json({ error: "Missing fields" });
-  }
-
-  try {
-    // Configure the transporter (for Gmail SMTP)
+    // Create a Nodemailer transporter using SMTP
+    // You'll need to replace these with your actual email service details
+    // For Gmail, you'd use 'smtp.gmail.com' and port 465 (for secure SSL) or 587 (for TLS)
+    // The YouTube video you provided [00:01:29] specifically mentions using Gmail.
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // true for 465, false for 587
+      service: 'gmail', // Use 'gmail' for Gmail accounts [00:01:29]
       auth: {
-        user: "aadityachauhan733@gmail.com", // Gmail address
-        pass: "xrownirhargeiuuy", // App password
+        user: "aadityachauhan733@gmail.com", // Your email address (sender) [00:02:22]
+        pass: "xrownirhargeiuuy", // Your App Password [00:02:47]
       },
     });
 
-    // Send email
-    const info = await transporter.sendMail({
-      from: `"${process.env.FROM_NAME || "Your App"}" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      text: body, // plain text
-      html: `<p>${body}</p>`, // HTML version
-    });
+    try {
+      // Send the email
+      const info = await transporter.sendMail({
+        from: process.env.EMAIL_USER, // Sender address [00:03:05]
+        to, // Recipient address [00:03:10]
+        subject, // Subject line [00:03:26]
+        text: body, // Plain text body [00:03:42]
+        // html: `<b>${body}</b>`, // Optional: HTML body
+      });
 
-    console.log("Message sent:", info.messageId);
-    res.status(200).json({ message: "Email sent!", messageId: info.messageId });
-  } catch (error) {
-    console.error("Email send error:", error);
-    res.status(500).json({ error: "Failed to send email" });
+      console.log('Message sent: %s', info.messageId);
+      res.status(200).json({ messageId: info.messageId, message: 'Email sent successfully!' });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      res.status(500).json({ error: 'Failed to send email. Please check server logs.' });
+    }
+  } else {
+    // Handle any non-POST requests
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
