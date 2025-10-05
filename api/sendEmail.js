@@ -1,47 +1,37 @@
-import nodemailer from "nodemailer";
-
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { to, subject, body } = req.body;
+
+  if (!to || !subject || !body) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed" });
-    }
-
-    const { to, subject, body } = req.body;
-    if (!to || !subject || !body) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
-
-    // Setup transporter (explicit host/port to avoid confusion)
-    const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
-  port: 587,
-  auth: {
-    user: "maddison53@ethereal.email",
-    pass: "jn7jnAPss4f63QBp6D",
-  },
-});
-
-    // Verify connection (helpful debug)
-    await transporter.verify().catch(err => {
-      throw new Error("SMTP verification failed: " + err.message);
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer re_d5J1h2qf_MWX97xHhC5JdBYzXP95NURUX`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Aaditya <onboarding@resend.dev>",
+        to,
+        subject,
+        html: `<p>${body}</p>`,
+      }),
     });
 
-    const info = await transporter.sendMail({
-      from: `"${process.env.FROM_NAME || "Mailer"}" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      text: body,
-      html: `<p>${body}</p>`,
-    });
+    const data = await response.json();
 
-    return res.status(200).json({ message: "Email sent!", messageId: info.messageId });
+    if (!response.ok) {
+      return res.status(500).json({ error: data.error?.message || "Failed to send email" });
+    }
 
+    res.status(200).json({ message: "Email sent!", data });
   } catch (error) {
-    // The key fix: always return clean JSON
-    console.error("Email send error:", error);
-    return res.status(500).json({
-      error: error?.message || "Unknown error occurred",
-      stack: error?.stack || null,
-    });
+    res.status(500).json({ error: error.message });
   }
 }
