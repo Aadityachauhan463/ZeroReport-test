@@ -13,14 +13,13 @@ export default async function handler(req, res) {
 
     // Setup transporter (explicit host/port to avoid confusion)
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+  host: "smtp.ethereal.email",
+  port: 587,
+  auth: {
+    user: "maddison53@ethereal.email",
+    pass: "jn7jnAPss4f63QBp6D",
+  },
+});
 
     // Verify connection (helpful debug)
     await transporter.verify().catch(err => {
