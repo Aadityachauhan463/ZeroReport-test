@@ -12,25 +12,30 @@ export default async function handler(req, res) {
   }
 
   try {
-    // SMTP transporter setup (Gmail example)
+    // Configure the transporter (for Gmail SMTP)
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for 465, false for 587
       auth: {
-        user: process.env.SMTP_USER, // your email
-        pass: process.env.SMTP_PASS, // app password (not your Gmail password)
+        user: process.env.SMTP_USER, // Gmail address
+        pass: process.env.SMTP_PASS, // App password
       },
     });
 
+    // Send email
     const info = await transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: `"${process.env.FROM_NAME || "Your App"}" <${process.env.SMTP_USER}>`,
       to,
       subject,
-      html: `<p>${body}</p>`,
+      text: body, // plain text
+      html: `<p>${body}</p>`, // HTML version
     });
 
+    console.log("Message sent:", info.messageId);
     res.status(200).json({ message: "Email sent!", messageId: info.messageId });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Email send error:", error);
     res.status(500).json({ error: "Failed to send email" });
   }
 }
